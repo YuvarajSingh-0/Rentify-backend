@@ -24,6 +24,9 @@ app.use(cors({
 app.use("/auth", authRoutes);
 app.use("/property", propertyRoutes);
 app.use('/user', userRoutes);
+app.get("/", (req, res) => {
+    res.send("Presidio API");
+});
 
 // app.use('/issues',issuesRouter)
 
