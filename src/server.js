@@ -5,7 +5,6 @@ const cors = require('cors');
 //Import the routes
 const authRoutes = require('./routes/auth.routes');
 const propertyRoutes = require('./routes/property.routes')
-const issuesRouter = require('./routes/issue.routes')
 const userRoutes = require('./routes/user.routes')
 
 // Create the express app
