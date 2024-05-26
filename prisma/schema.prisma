@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model UsersInfo {
+  id               String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email            String      @unique
+  name             String?
+  password         String
+  role             Role
+  contact          String
+  createdAt        DateTime    @default(dbgenerated("now()"))
+  updatedAt        DateTime    @default(dbgenerated("now()")) @updatedAt
+  propertiesOwned  Property[]  @relation("OwnedProperties")
+  propertiesRented Property?   @relation("RentedProperties")
+  likes            UserLikes[]
+}
+
+model Property {
+  id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  owner           UsersInfo   @relation("OwnedProperties", fields: [ownerId], references: [id])
+  ownerId         String      @db.Uuid
+  name            String
+  location        String
+  city            String
+  price           Int
+  amenities       String[]
+  nearbySchools   String[]
+  nearbyHospitals String[]
+  nearbyMetros    String[]
+  bathrooms       Int         @default(0)
+  bedrooms        Int         @default(0)
+  area            String      @default("")
+  images          String[]
+  description     String      @db.Text
+  tenant          UsersInfo?  @relation("RentedProperties", fields: [tenantId], references: [id])
+  tenantId        String?     @unique @db.Uuid
+  createdAt       DateTime    @default(dbgenerated("now()"))
+  updatedAt       DateTime    @default(dbgenerated("now()")) @updatedAt
+  likes           UserLikes[]
+  likesCount      Int         @default(0)
+}
+
+model UserLikes {
+  user       UsersInfo @relation(fields: [userId], references: [id])
+  userId     String    @db.Uuid
+  property   Property  @relation(fields: [propertyId], references: [id])
+  propertyId String    @db.Uuid
+
+  @@id([userId, propertyId])
+}
+
+enum Role {
+  SELLER
+  BUYER
+}
