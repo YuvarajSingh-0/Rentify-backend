@@ -25,8 +25,6 @@ npm install
 ```
 DATABASE_URL
 DIRECT_URL
-UPLOADTHING_SECRET
-UPLOADTHING_APP_ID
 JWT_SECRET
 MAIL_USERNAME
 MAIL_PASSWORD
@@ -43,6 +41,11 @@ npm start
 - [bcrypt](https://www.npmjs.com/package/bcrypt)
 - [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)
 - [nodemailer](https://www.npmjs.com/package/nodemailer)
+- [supabse]()
+
+### Note
+
+Realtime Like feature is made possible by supabase. There is also another way of doing this which includes using socket module to connect with backend and to listen to event(like/unlike).
 
 ### Authors
 - [Yuvaraj Singh](https://www.github.com/yuvarajsingh-0)
