@@ -12,9 +12,9 @@ const app = express();
 const port = 9000;
 
 // Middlewares
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors());
 
 // Register API routes
 app.use("/auth", authRoutes);
