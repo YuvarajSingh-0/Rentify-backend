@@ -2,7 +2,6 @@ const express = require('express');
 const { authenticateToken } = require('../middlewares/isLoggedIn');
 const { addProperty, fetchProperties, fetchPropertyById, fetchPropertiesByOwner, updateProperty, deleteProperty, handleMailSend } = require('../controllers/properties.controller');
 const isOwner = require('../middlewares/isOwner');
-const { fetchIssuesByTenant } = require('../controllers/issues.controller');
 const { getUser } = require('../controllers/users.constroller');
 
 const router = express.Router();
@@ -23,11 +22,6 @@ router.get('/self', authenticateToken, isOwner, async (req, res) => {
     const sort = req.query.sort || '';
     const order = req.query.order || '';
     const properties = await fetchPropertiesByOwner(req.userId, { page, limit, search, sort, order });
-    res.json(properties);
-});
-
-router.get('/issues', authenticateToken, async (req, res) => {
-    const properties = await fetchIssuesByTenant(req.userId);
     res.json(properties);
 });
 
