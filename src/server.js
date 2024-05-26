@@ -14,7 +14,10 @@ const port = 9000;
 // Middlewares
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors());
+app.use(cors({
+    origin: 'https://master--presidio-assignment.netlify.app',
+    credentials: true
+}));
 
 // Register API routes
 app.use("/auth", authRoutes);
