@@ -15,7 +15,7 @@ const port = 9000;
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: "https://master--presidio-assignment.netlify.app",
+    origin: "*",
     credentials: true,
 }));
 
