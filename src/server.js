@@ -25,6 +25,7 @@ app.use("/auth", authRoutes);
 app.use("/property", propertyRoutes);
 app.use('/user', userRoutes);
 app.get("/", (req, res) => {
+    console.log(process.env.FRONTEND_URL)
     res.send("Presidio API");
 });
 
