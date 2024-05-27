@@ -23,28 +23,31 @@ model UsersInfo {
 }
 
 model Property {
-  id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  owner           UsersInfo   @relation("OwnedProperties", fields: [ownerId], references: [id])
-  ownerId         String      @db.Uuid
-  name            String
-  location        String
-  city            String
-  price           Int
-  amenities       String[]
-  nearbySchools   String[]
-  nearbyHospitals String[]
-  nearbyMetros    String[]
-  bathrooms       Int         @default(0)
-  bedrooms        Int         @default(0)
-  area            String      @default("")
-  images          String[]
-  description     String      @db.Text
-  tenant          UsersInfo?  @relation("RentedProperties", fields: [tenantId], references: [id])
-  tenantId        String?     @unique @db.Uuid
-  createdAt       DateTime    @default(dbgenerated("now()"))
-  updatedAt       DateTime    @default(dbgenerated("now()")) @updatedAt
-  likes           UserLikes[]
-  likesCount      Int         @default(0)
+  id               String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  owner            UsersInfo   @relation("OwnedProperties", fields: [ownerId], references: [id])
+  ownerId          String      @db.Uuid
+  name             String
+  location         String
+  city             String
+  price            Int
+  amenities        String[]
+  nearbySchools    String[]
+  nearbyHospitals  String[]
+  nearbyMetros     String[]
+  metroDistance    Int         @default(0)
+  hospitalDistance Int         @default(0)
+  schoolDistance   Int         @default(0)
+  bathrooms        Int         @default(0)
+  bedrooms         Int         @default(0)
+  area             String      @default("")
+  images           String[]
+  description      String      @db.Text
+  tenant           UsersInfo?  @relation("RentedProperties", fields: [tenantId], references: [id])
+  tenantId         String?     @unique @db.Uuid
+  createdAt        DateTime    @default(dbgenerated("now()"))
+  updatedAt        DateTime    @default(dbgenerated("now()")) @updatedAt
+  likes            UserLikes[]
+  likesCount       Int         @default(0)
 }
 
 model UserLikes {

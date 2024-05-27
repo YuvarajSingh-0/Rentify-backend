@@ -2,9 +2,14 @@ const SENDMAIL = require('../mail');
 const prisma = require('../prisma');
 
 const fetchProperties = async (query) => {
-    console.log("query 2", query);
+    // console.log("query 2", query);
     let whereClause = {};
     let orderByClause = {};
+    query.metroDistance=parseInt(query.metroDistance);
+    query.schoolDistance=parseInt(query.schoolDistance);
+    query.hospitalDistance=parseInt(query.hospitalDistance);
+    query.minPrice=parseInt(query.minPrice);
+    query.maxPrice=parseInt(query.maxPrice);
     if (query.sort !== '' && query.order !== '') {
         orderByClause[query.sort] = query.order;
     }
@@ -30,8 +35,32 @@ const fetchProperties = async (query) => {
                     },
                 },
             ],
+            AND: [
+                {
+                    metroDistance: {
+                        lte: query.metroDistance !== 0 ? query.metroDistance : 1000
+                    }
+                },
+                {
+                    schoolDistance: {
+                        lte: query.schoolDistance !== 0 ? query.schoolDistance : 1000
+                    }
+                },
+                {
+                    hospitalDistance: {
+                        lte: query.hospitalDistance !== 0 ? query.hospitalDistance : 1000
+                    }
+                },
+                {
+                    price: {
+                        gte: query.minPrice,
+                        lte: query.maxPrice
+                    }
+                }
+            ]
         }
     }
+
     const properties = await prisma.property.findMany({
         include: {
             owner: {
@@ -56,117 +85,7 @@ const fetchProperties = async (query) => {
         where: whereClause,
         orderBy: orderByClause
     });
-    console.log("properties", properties);
-    return properties;
-}
-
-const fetchPropertiesByKeyword = async (keyword) => {
-    const properties = await prisma.property.findMany({
-        where: {
-            OR: [
-                {
-                    name: {
-                        contains: keyword,
-                        mode: 'insensitive',
-                    },
-                },
-                {
-                    description: {
-                        contains: keyword,
-                        mode: 'insensitive',
-                    },
-                },
-                {
-                    location: {
-                        contains: keyword,
-                        mode: 'insensitive',
-                    },
-                },
-            ],
-        },
-        include: {
-            owner: true,
-            tenant: true
-        }
-    });
-    return properties;
-}
-
-
-const fetchPropertiesByKeywordAndOwnerId = async (keyword, ownerId) => {
-    const properties = await prisma.property.findMany({
-        where: {
-            OR: [
-                {
-                    name: {
-                        contains: keyword,
-                        mode: 'insensitive',
-                    },
-                },
-                {
-                    description: {
-                        contains: keyword,
-                        mode: 'insensitive',
-                    },
-                },
-                {
-                    location: {
-                        contains: keyword,
-                        mode: 'insensitive',
-                    },
-                },
-            ],
-            ownerId: ownerId
-        },
-        include: {
-            owner: {
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    contact: true,
-                }
-            },
-            tenant: {
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    contact: true,
-                }
-            }
-        }
-    });
-    return properties;
-}
-
-const fetchPropertiesByLocation = async (location) => {
-    const properties = await prisma.properties.findMany({
-        where: {
-            location: {
-                contains: location,
-                mode: 'insensitive',
-            },
-        },
-        include: {
-            owner: {
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    contact: true,
-                }
-            },
-            tenant: {
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    contact: true,
-                }
-            }
-        }
-    });
+    // console.log("properties", properties);
     return properties;
 }
 
@@ -199,8 +118,32 @@ const fetchPropertyById = async (id) => {
 }
 
 const fetchPropertiesByOwner = async (ownerId, query) => {
+    // console.log("query", query);
     let whereClause = {
         ownerId,
+        AND: [
+            {
+                metroDistance: {
+                    lte: query.metroDistance !== 0 ? query.metroDistance : 1000
+                }
+            },
+            {
+                schoolDistance: {
+                    lte: query.schoolDistance !== 0 ? query.schoolDistance : 1000
+                }
+            },
+            {
+                hospitalDistance: {
+                    lte: query.hospitalDistance !== 0 ? query.hospitalDistance : 1000
+                }
+            },
+            {
+                price: {
+                    gte: query.minPrice,
+                    lte: query.maxPrice
+                }
+            }
+        ]
     };
     let orderByClause = {};
     if (query.sort !== '' && query.order !== '') {
@@ -255,24 +198,21 @@ const fetchPropertiesByOwner = async (ownerId, query) => {
         where: whereClause,
         orderBy: orderByClause
     });
+    // console.log("in cont",properties)
     return properties;
 }
 
-const getPropertyByTenantId = async (tenantId) => {
-    const property = await prisma.property.findFirst({
-        where: {
-            tenantId,
-        },
-    });
-    return property;
-}
-
-
 const addProperty = async (data) => {
-    const { name, description, price, city, location, ownerId, images, area } = data;
-    console.log("data", data);
+    const { name, description, price, city, location, ownerId, images, area, metroDistance, schoolDistance, hospitalDistance } = data;
+    // console.log("data", data);
     let amenities = data.amenities
     amenities = amenities.split(',').map((amenity) => amenity.trim());
+    let nearbyMetros = data.nearbyMetros
+    nearbyMetros = nearbyMetros.split(',').map((metro) => metro.trim());
+    let nearbySchools = data.nearbySchools
+    nearbySchools = nearbySchools.split(',').map((school) => school.trim());
+    let nearbyHospitals = data.nearbyHospitals
+    nearbyHospitals = nearbyHospitals.split(',').map((hospital) => hospital.trim());
     const property = await prisma.property.create({
         data: {
             name,
@@ -287,10 +227,16 @@ const addProperty = async (data) => {
             amenities,
             location,
             images,
-            area
+            area,
+            nearbyMetros,
+            nearbySchools,
+            nearbyHospitals,
+            metroDistance,
+            schoolDistance,
+            hospitalDistance
         },
     });
-    console.log(property)
+    // console.log(property)
     return property;
 }
 
@@ -406,4 +352,4 @@ const handleMailSend = async (ownerMail, buyer, property) => {
 }
 
 
-module.exports = { fetchPropertiesByOwner, addProperty, fetchProperties, fetchPropertiesByLocation, fetchPropertyById, getPropertyByTenantId, fetchPropertiesByKeyword, fetchPropertiesByKeywordAndOwnerId, updateProperty, deleteProperty, handleMailSend };
+module.exports = { fetchPropertiesByOwner, addProperty, fetchProperties, fetchPropertyById, updateProperty, deleteProperty, handleMailSend };
